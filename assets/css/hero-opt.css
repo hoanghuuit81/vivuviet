@@ -1,0 +1,9 @@
+.hero-bg {
+    background-image: url('../images/hero-vietnam.webp');
+}
+
+.about-hero {
+    background-image:
+        linear-gradient(rgba(4, 39, 30, .55), rgba(4, 39, 30, .75)),
+        url('../images/hero-vietnam.webp');
+}

@@ -1,0 +1,14 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(app|config|database|templates)/ - [F,L]
+    RewriteRule ^admin/?$ index.php?page=admin-login [QSA,L]
+    RewriteRule ^admin/dashboard/?$ index.php?page=admin [QSA,L]
+    RewriteRule ^admin/places/new/?$ index.php?page=admin-place-create [QSA,L]
+</IfModule>
+
+<FilesMatch "^(\.env|.*\.sql)$">
+    Require all denied
+</FilesMatch>

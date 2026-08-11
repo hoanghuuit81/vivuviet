@@ -1,0 +1,425 @@
+-- MySQL dump 10.13  Distrib 8.0.46, for Linux (x86_64)
+--
+-- Host: 127.0.0.1    Database: miniproject
+-- ------------------------------------------------------
+-- Server version	8.0.46-0ubuntu0.22.04.3
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `article_likes`
+--
+
+DROP TABLE IF EXISTS `article_likes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `article_likes` (
+  `article_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`article_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `article_likes_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `article_likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `article_likes`
+--
+
+LOCK TABLES `article_likes` WRITE;
+/*!40000 ALTER TABLE `article_likes` DISABLE KEYS */;
+INSERT INTO `article_likes` VALUES (1,2,'2026-08-11 04:41:11'),(3,2,'2026-08-11 06:26:12'),(4,2,'2026-08-11 04:31:02'),(8,2,'2026-08-11 04:31:02');
+/*!40000 ALTER TABLE `article_likes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `articles`
+--
+
+DROP TABLE IF EXISTS `articles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `articles` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `place_id` int unsigned NOT NULL,
+  `author_id` int unsigned DEFAULT NULL,
+  `title` varchar(220) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(240) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `excerpt` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cover_image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('draft','published','hidden') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `place_id` (`place_id`),
+  KEY `author_id` (`author_id`),
+  KEY `idx_articles_status_date` (`status`,`published_at`),
+  FULLTEXT KEY `ft_articles` (`title`,`excerpt`,`content`),
+  CONSTRAINT `articles_ibfk_1` FOREIGN KEY (`place_id`) REFERENCES `places` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `articles_ibfk_2` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `articles`
+--
+
+LOCK TABLES `articles` WRITE;
+/*!40000 ALTER TABLE `articles` DISABLE KEYS */;
+INSERT INTO `articles` VALUES (1,1,1,'Một ngày lênh đênh giữa kỳ quan Vịnh Hạ Long','mot-ngay-vinh-ha-long','Lịch trình gợi ý để cảm nhận trọn vẹn vẻ đẹp của Hạ Long từ bình minh đến hoàng hôn.','Buổi sáng, hãy có mặt tại bến tàu sớm để hoàn tất thủ tục và tận hưởng không khí mát dịu. Khi tàu rời bến, thành phố dần lùi lại phía sau, nhường chỗ cho những đảo đá có hình dáng kỳ thú.\n\nBuổi trưa là lúc nghỉ ngơi và thưởng thức hải sản trên tàu. Sang chiều, trải nghiệm chèo kayak đưa bạn đến gần hơn với vách núi và các áng nước kín. Hãy dành vài phút cất điện thoại để lắng nghe tiếng mái chèo và mặt nước.\n\nMột chuyến đi có trách nhiệm luôn đi cùng việc hạn chế đồ nhựa dùng một lần và không để lại rác trên vịnh.','https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1500&q=88','published',1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(2,2,1,'Kinh nghiệm đi thuyền Tràng An lần đầu','kinh-nghiem-di-thuyen-trang-an','Chọn tuyến, thời gian xuất phát và những vật dụng nên mang theo khi đến Tràng An.','Mỗi tuyến thuyền ở Tràng An có số hang và điểm đền khác nhau, nhưng đều kéo dài vài giờ. Nếu đi lần đầu, hãy chọn theo sức khỏe và lời tư vấn tại quầy vé.\n\nBuổi sáng thường mát, ánh sáng mềm và lượng khách dễ chịu. Mũ rộng vành, kem chống nắng, nước uống là những vật dụng nên có. Áo phao cần được mặc đúng hướng dẫn trong suốt hành trình.\n\nVào mùa lễ hội, nên tránh cuối tuần nếu bạn muốn có trải nghiệm yên tĩnh.','https://images.unsplash.com/photo-1521993117367-b7f70ccd029d?auto=format&fit=crop&w=1500&q=88','published',1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(3,3,1,'Chạm đỉnh Fansipan: chuẩn bị gì cho ngày săn mây?','cham-dinh-fansipan-san-may','Gợi ý trang phục, thời điểm và cách giữ sức khi lên Fansipan.','Nhiệt độ trên đỉnh có thể thấp hơn đáng kể so với trung tâm Sa Pa. Hãy mặc nhiều lớp mỏng để dễ điều chỉnh và chọn giày có độ bám tốt.\n\nNếu đi cáp treo, bạn vẫn cần leo thêm nhiều bậc thang để đến cột mốc đỉnh. Đi chậm, nghỉ đều và uống nước từng ngụm nhỏ sẽ giúp cơ thể thích nghi.\n\nBiển mây phụ thuộc thời tiết; kể cả khi trời nhiều sương, hành trình giữa núi cao vẫn là một trải nghiệm đáng nhớ.','https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=88','published',0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(4,4,1,'Hội An từ sớm mai đến đêm đèn lồng','hoi-an-som-mai-den-dem-den-long','Một lịch trình đi bộ chậm để nghe phố cổ kể chuyện qua từng thời khắc.','Bắt đầu ngày mới ở khu chợ khi người dân còn đang chuẩn bị hàng. Đây là lúc phố chưa đông và bạn dễ bắt gặp nhịp sống địa phương chân thật.\n\nBuổi trưa, tìm một hiên nhà râm mát, thưởng thức cao lầu rồi ghé các hội quán. Khi nắng dịu, đi dọc sông Hoài và chờ phố lên đèn.\n\nĐừng chỉ tìm góc chụp ảnh; một cuộc trò chuyện với người làm đèn lồng hay chủ quán nhỏ thường là ký ức lâu bền nhất.','https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1500&q=88','published',1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(5,5,1,'Cầu Vàng trong mây: thời điểm nào đẹp nhất?','cau-vang-trong-may','Những lưu ý giúp bạn tránh đông và tận hưởng khung cảnh trên cao.','Khung giờ đầu ngày thường mang lại cơ hội tốt nhất để đi bộ thong thả trên Cầu Vàng. Tuy nhiên, sương và mây thay đổi rất nhanh nên mỗi lần ghé đều có vẻ đẹp riêng.\n\nChuẩn bị áo khoác mỏng, giày êm và kiểm tra lịch vận hành cáp treo. Không nên chen lấn ở các điểm chụp ảnh; phần giữa cầu và lối ra cũng có nhiều góc thoáng.','https://images.unsplash.com/photo-1584003564911-a7a321c84e1c?auto=format&fit=crop&w=1500&q=88','published',0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(6,6,1,'Nửa ngày bước qua lịch sử ở Đại Nội Huế','nua-ngay-dai-noi-hue','Lộ trình tham quan những công trình tiêu biểu trong Hoàng thành.','Từ Ngọ Môn, hành trình dẫn qua sân Đại Triều Nghi và những không gian từng là trung tâm nghi lễ. Các bảng thông tin tại điểm giúp chuyến tham quan có chiều sâu hơn.\n\nHuế nắng mạnh vào giữa ngày, vì vậy buổi sáng sớm hoặc sau 14 giờ là lựa chọn dễ chịu. Trang phục lịch sự thể hiện sự tôn trọng đối với di sản và các không gian thờ tự.','https://images.unsplash.com/photo-1570366583862-f91883984fde?auto=format&fit=crop&w=1500&q=88','published',1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(7,7,1,'Ra khơi ở Nha Trang: một ngày xanh trên vịnh','mot-ngay-tren-vinh-nha-trang','Kinh nghiệm chọn hoạt động biển và bảo vệ hệ sinh thái san hô.','Một chuyến đi vịnh thường bắt đầu từ sáng và ghé vài đảo trong ngày. Hãy hỏi rõ chương trình, bữa ăn và thiết bị an toàn trước khi đặt.\n\nKhi lặn ngắm san hô, giữ khoảng cách, không đứng lên rạn và không mang sinh vật biển về làm kỷ niệm. Những lựa chọn nhỏ giúp vẻ đẹp của vịnh còn mãi.','https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1500&q=88','published',0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(8,8,1,'Phú Quốc cho người muốn đi chậm','phu-quoc-cho-nguoi-muon-di-cham','Ba ngày cân bằng giữa biển, rừng và những buổi chiều ngắm mặt trời lặn.','Thay vì chạy theo quá nhiều điểm, hãy chia mỗi ngày cho một khu vực. Một ngày dành cho bãi biển, một ngày khám phá phía bắc và ngày còn lại thưởng thức ẩm thực địa phương.\n\nHoàng hôn bờ tây rất nổi tiếng nhưng bạn vẫn có thể tìm những đoạn bờ biển yên tĩnh. Hãy tôn trọng biển báo, không xả rác và hạn chế tác động đến hệ sinh thái.','https://images.unsplash.com/photo-1540202404-a2f29016b523?auto=format&fit=crop&w=1500&q=88','published',1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(9,9,1,'Ăn sáng quanh Chợ Bến Thành như người địa phương','an-sang-quanh-cho-ben-thanh','Một vòng khám phá những hương vị quen thuộc giữa trung tâm thành phố.','Buổi sáng là lúc khu chợ nhộn nhịp theo một cách rất riêng. Bạn có thể bắt đầu bằng một tô bún, thêm ly cà phê sữa đá rồi dạo quanh các gian hàng.\n\nHỏi giá và xác nhận phần ăn trước khi gọi giúp trải nghiệm thoải mái hơn. Nếu đông, hãy kiên nhẫn chia sẻ bàn như cách nhiều người địa phương vẫn làm.','https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1500&q=88','published',0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(10,10,1,'Về Đất Mũi nghe rừng đước thở','ve-dat-mui-nghe-rung-duoc-tho','Hành trình chạm mốc cuối trời Nam và khám phá hệ sinh thái ngập mặn.','Con đường về Đất Mũi mở dần ra cảnh quan sông nước và rừng đước. Tại khu biểu tượng, du khách có thể ngắm vùng đất bồi hướng ra biển.\n\nMột chuyến xuồng xuyên rừng mang đến góc nhìn gần gũi về hệ sinh thái ngập mặn. Hãy đi cùng người hướng dẫn địa phương và tuân thủ quy định bảo tồn.','https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1500&q=88','published',0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:44:57');
+/*!40000 ALTER TABLE `articles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categories`
+--
+
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categories` (
+  `id` tinyint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(90) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `categories`
+--
+
+LOCK TABLES `categories` WRITE;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` VALUES (1,'Di sản & văn hóa','di-san-van-hoa'),(2,'Biển & đảo','bien-dao'),(3,'Núi & khám phá','nui-kham-pha'),(4,'Thiên nhiên','thien-nhien'),(5,'Vui chơi','vui-choi'),(6,'Ẩm thực & chợ','am-thuc-cho');
+/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `article_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `content` varchar(1500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('visible','hidden') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'visible',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `idx_comments_article_status` (`article_id`,`status`),
+  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comments`
+--
+
+LOCK TABLES `comments` WRITE;
+/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
+INSERT INTO `comments` VALUES (1,1,2,'Khung cảnh rất đẹp, mình đi vào đầu mùa hè và buổi sáng khá dễ chịu.','visible','2026-08-11 04:31:02','2026-08-11 04:31:02'),(5,3,2,'quá oke','visible','2026-08-11 06:26:33','2026-08-11 06:26:33');
+/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `contact_messages`
+--
+
+DROP TABLE IF EXISTS `contact_messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `contact_messages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subject` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('new','read','resolved') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `idx_contact_status_created` (`status`,`created_at`),
+  CONSTRAINT `contact_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contact_messages`
+--
+
+LOCK TABLES `contact_messages` WRITE;
+/*!40000 ALTER TABLE `contact_messages` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contact_messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `moderation_logs`
+--
+
+DROP TABLE IF EXISTS `moderation_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `moderation_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `admin_id` int unsigned NOT NULL,
+  `place_id` int unsigned DEFAULT NULL,
+  `action` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `note` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `admin_id` (`admin_id`),
+  KEY `place_id` (`place_id`),
+  CONSTRAINT `moderation_logs_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `moderation_logs_ibfk_2` FOREIGN KEY (`place_id`) REFERENCES `places` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `moderation_logs`
+--
+
+LOCK TABLES `moderation_logs` WRITE;
+/*!40000 ALTER TABLE `moderation_logs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `moderation_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `notifications`
+--
+
+DROP TABLE IF EXISTS `notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notifications` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
+  `title` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `link` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notifications`
+--
+
+LOCK TABLES `notifications` WRITE;
+/*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `places`
+--
+
+DROP TABLE IF EXISTS `places`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `places` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `province_id` smallint unsigned NOT NULL,
+  `submitted_by` int unsigned DEFAULT NULL,
+  `name` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` tinyint unsigned DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `short_description` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cover_image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price_info` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `opening_hours` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
+  `status` enum('pending','approved','changes_requested','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `admin_note` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `province_id` (`province_id`),
+  KEY `submitted_by` (`submitted_by`),
+  KEY `category_id` (`category_id`),
+  KEY `idx_places_status_province` (`status`,`province_id`),
+  FULLTEXT KEY `ft_places` (`name`,`short_description`,`description`),
+  CONSTRAINT `places_ibfk_1` FOREIGN KEY (`province_id`) REFERENCES `provinces` (`id`),
+  CONSTRAINT `places_ibfk_2` FOREIGN KEY (`submitted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `places_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `places`
+--
+
+LOCK TABLES `places` WRITE;
+/*!40000 ALTER TABLE `places` DISABLE KEYS */;
+INSERT INTO `places` VALUES (1,3,1,'Vịnh Hạ Long','vinh-ha-long',2,'Thành phố Hạ Long, Quảng Ninh','Kỳ quan thiên nhiên với hàng nghìn đảo đá vôi giữa làn nước xanh ngọc.','Vịnh Hạ Long mở ra một thế giới của núi đá, hang động và những làng chài bình yên. Hành trình đẹp nhất thường bắt đầu từ bến tàu vào sáng sớm, khi lớp sương mỏng còn phủ trên mặt vịnh.\n\nDu khách có thể chọn chuyến tham quan trong ngày hoặc ngủ đêm trên vịnh để ngắm hoàng hôn, chèo kayak và khám phá hang động.','https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=85','290.000đ – 1.200.000đ','06:00 – 18:00',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(2,4,1,'Quần thể Tràng An','trang-an-ninh-binh',4,'Hoa Lư, Ninh Bình','Hành trình thuyền nan len giữa núi đá vôi, hang xuyên thủy và đền cổ.','Tràng An gây ấn tượng bằng những dòng sông trong xanh uốn quanh chân núi. Mỗi tuyến thuyền đưa du khách qua hệ thống hang động và điểm tâm linh khác nhau.\n\nNên đến vào buổi sáng, chuẩn bị mũ và nước uống, đồng thời giữ yên lặng khi qua các khu vực đền thờ.','https://images.unsplash.com/photo-1521993117367-b7f70ccd029d?auto=format&fit=crop&w=1400&q=85','250.000đ/người','07:00 – 16:30',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(3,5,1,'Đỉnh Fansipan','dinh-fansipan',3,'Sa Pa, Lào Cai','Chạm tay vào nóc nhà Đông Dương giữa biển mây Tây Bắc.','Fansipan cao 3.143 mét, là biểu tượng của những chuyến đi chinh phục miền núi phía Bắc. Du khách có thể trekking nhiều ngày hoặc sử dụng cáp treo.\n\nThời tiết thay đổi nhanh nên hãy mang áo ấm, giày chống trượt và kiểm tra dự báo trước khi khởi hành.','https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=85','Theo dịch vụ cáp treo','07:30 – 17:30',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(4,21,1,'Phố cổ Hội An','pho-co-hoi-an',1,'Phường Hội An, Đà Nẵng','Những mái ngói rêu phong, đèn lồng và nhịp sống chậm bên sông Hoài.','Hội An đẹp vào mọi thời điểm trong ngày. Buổi sáng bình dị với những quán nhỏ mở cửa sớm; chiều vàng ươm trên các bức tường cổ; đêm đến phố bừng sáng trong sắc đèn lồng.\n\nHãy dành thời gian đi bộ, ghé các hội quán, thưởng thức cao lầu và quan sát đời sống bên sông.','https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1400&q=85','120.000đ/vé tham quan','Cả ngày',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(5,21,1,'Cầu Vàng Bà Nà Hills','cau-vang-ba-na-hills',5,'Hòa Vang, Đà Nẵng','Cây cầu giữa mây được nâng đỡ bởi đôi bàn tay đá khổng lồ.','Cầu Vàng nằm trong quần thể Bà Nà Hills, nổi bật với tầm nhìn bao quát núi rừng. Thời điểm ít đông thường là đầu giờ sáng.\n\nKhu vực trên cao có thể lạnh và nhiều sương kể cả mùa hè, vì vậy một chiếc áo khoác nhẹ sẽ hữu ích.','https://images.unsplash.com/photo-1584003564911-a7a321c84e1c?auto=format&fit=crop&w=1400&q=85','Theo vé khu du lịch','08:00 – 22:00',NULL,NULL,'approved',NULL,0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(6,20,1,'Đại Nội Huế','dai-noi-hue',1,'Phú Hậu, Huế','Không gian cung đình trầm mặc lưu giữ dấu ấn triều Nguyễn.','Đại Nội là trái tim của quần thể di tích cố đô Huế. Những cổng thành, sân điện và hành lang đỏ kể lại nhiều lớp lịch sử.\n\nDu khách nên dành ít nhất nửa ngày, mặc trang phục lịch sự và mang theo nước uống vào mùa nắng.','https://images.unsplash.com/photo-1570366583862-f91883984fde?auto=format&fit=crop&w=1400&q=85','200.000đ/người lớn','06:30 – 17:30',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(7,25,1,'Vịnh Nha Trang','vinh-nha-trang',2,'Nha Trang, Khánh Hòa','Vịnh biển trong xanh với nhiều hòn đảo và hoạt động dưới nước.','Nha Trang kết hợp thuận tiện giữa nghỉ dưỡng đô thị và khám phá biển đảo. Một ngày trên vịnh có thể gồm lặn ngắm san hô, tắm biển và ghé làng chài.\n\nNên chọn đơn vị vận hành uy tín, tuân thủ hướng dẫn an toàn và không chạm vào san hô.','https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=85','Tùy tour','Cả ngày',NULL,NULL,'approved',NULL,0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(8,32,1,'Đảo Phú Quốc','dao-phu-quoc',2,'Phú Quốc, An Giang','Đảo ngọc với bãi cát dài, rừng xanh và hoàng hôn rực rỡ.','Phú Quốc có đủ trải nghiệm từ nghỉ dưỡng, khám phá rừng đến những chuyến đi canô qua các đảo nhỏ. Bờ tây là nơi ngắm hoàng hôn đẹp, trong khi phía bắc còn nhiều mảng xanh.\n\nMùa khô thuận lợi cho hoạt động biển; mùa mưa lại yên tĩnh và có mức chi phí dễ chịu hơn.','https://images.unsplash.com/photo-1540202404-a2f29016b523?auto=format&fit=crop&w=1400&q=85','Tùy trải nghiệm','Cả ngày',NULL,NULL,'approved',NULL,1,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(9,29,1,'Chợ Bến Thành','cho-ben-thanh',6,'Phường Bến Thành, TP. Hồ Chí Minh','Biểu tượng đô thị với ẩm thực, quà lưu niệm và nhịp sống náo nhiệt.','Chợ Bến Thành là một điểm dừng dễ tiếp cận ở trung tâm thành phố. Bên trong có nhiều gian hàng đồ thủ công, vải vóc và món ăn địa phương.\n\nHãy hỏi giá trước khi mua, ưu tiên thanh toán rõ ràng và thử một bữa sáng theo phong cách Sài Gòn.','https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1400&q=85','Miễn phí vào cửa','06:00 – 22:00',NULL,NULL,'approved',NULL,0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02'),(10,34,1,'Đất Mũi Cà Mau','dat-mui-ca-mau',4,'Ngọc Hiển, Cà Mau','Nơi đất liền vươn ra biển, bao quanh bởi rừng đước và phù sa.','Đất Mũi mang vẻ đẹp khoáng đạt của rừng ngập mặn và những con đường xuyên rừng. Đây là nơi nhiều du khách muốn chạm mốc cuối trời Nam.\n\nChuyến đi sẽ trọn vẹn hơn khi kết hợp trải nghiệm ẩm thực địa phương và tìm hiểu đời sống cư dân vùng ngập mặn.','https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1400&q=85','30.000đ/người','07:00 – 18:00',NULL,NULL,'approved',NULL,0,'2026-08-11 04:31:02','2026-08-11 04:31:02','2026-08-11 04:31:02');
+/*!40000 ALTER TABLE `places` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `provinces`
+--
+
+DROP TABLE IF EXISTS `provinces`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `provinces` (
+  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
+  `region_id` tinyint unsigned NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `region_id` (`region_id`),
+  CONSTRAINT `provinces_ibfk_1` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `provinces`
+--
+
+LOCK TABLES `provinces` WRITE;
+/*!40000 ALTER TABLE `provinces` DISABLE KEYS */;
+INSERT INTO `provinces` VALUES (1,1,'Hà Nội','ha-noi','https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?auto=format&fit=crop&w=900&q=80','Thủ đô nghìn năm văn hiến với phố cổ và những hồ nước yên bình.'),(2,1,'Hải Phòng','hai-phong','https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=80','Thành phố cảng và những hòn đảo xanh.'),(3,1,'Quảng Ninh','quang-ninh','https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=900&q=80','Miền di sản với kỳ quan vịnh Hạ Long.'),(4,1,'Ninh Bình','ninh-binh','https://images.unsplash.com/photo-1521993117367-b7f70ccd029d?auto=format&fit=crop&w=900&q=80','Non nước hữu tình và cố đô Hoa Lư.'),(5,1,'Lào Cai','lao-cai','https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80','Nóc nhà Đông Dương và ruộng bậc thang trong mây.'),(6,1,'Điện Biên','dien-bien',NULL,'Vùng đất lịch sử giữa núi rừng Tây Bắc.'),(7,1,'Tuyên Quang','tuyen-quang',NULL,'Suối khoáng, hồ và núi đá kỳ vĩ.'),(8,1,'Cao Bằng','cao-bang','https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=900&q=80','Thác Bản Giốc và công viên địa chất toàn cầu.'),(9,1,'Lạng Sơn','lang-son',NULL,'Xứ Lạng với núi non, hang động và văn hóa chợ phiên.'),(10,1,'Lai Châu','lai-chau',NULL,'Những đỉnh núi cao và bản làng nguyên sơ.'),(11,1,'Sơn La','son-la',NULL,'Cao nguyên Mộc Châu xanh mát bốn mùa.'),(12,1,'Thái Nguyên','thai-nguyen',NULL,'Vùng chè xanh và hồ Núi Cốc thơ mộng.'),(13,1,'Phú Thọ','phu-tho',NULL,'Đất Tổ cội nguồn của dân tộc Việt Nam.'),(14,1,'Bắc Ninh','bac-ninh',NULL,'Miền quan họ với đình chùa cổ kính.'),(15,1,'Hưng Yên','hung-yen',NULL,'Phố Hiến xưa và những làng quê Bắc Bộ.'),(16,2,'Thanh Hóa','thanh-hoa',NULL,'Biển Sầm Sơn và những miền núi xanh.'),(17,2,'Nghệ An','nghe-an',NULL,'Quê hương giàu truyền thống và bờ biển dài.'),(18,2,'Hà Tĩnh','ha-tinh',NULL,'Biển, núi và những di sản văn hóa đặc sắc.'),(19,2,'Quảng Trị','quang-tri',NULL,'Dấu ấn lịch sử và những bãi biển thanh bình.'),(20,2,'Huế','hue','https://images.unsplash.com/photo-1570366583862-f91883984fde?auto=format&fit=crop&w=900&q=80','Cố đô trầm mặc bên dòng Hương Giang.'),(21,2,'Đà Nẵng','da-nang','https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=80','Thành phố biển năng động trên cung đường di sản.'),(22,2,'Quảng Ngãi','quang-ngai',NULL,'Đảo Lý Sơn giữa biển xanh và dấu tích văn hóa Sa Huỳnh.'),(23,2,'Gia Lai','gia-lai',NULL,'Biển Hồ, núi lửa và sắc màu đại ngàn.'),(24,2,'Đắk Lắk','dak-lak',NULL,'Thủ phủ cà phê và văn hóa cồng chiêng.'),(25,2,'Khánh Hòa','khanh-hoa','https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80','Thiên đường biển đảo với vịnh Nha Trang.'),(26,2,'Lâm Đồng','lam-dong','https://images.unsplash.com/photo-1494522358652-f30e61a60313?auto=format&fit=crop&w=900&q=80','Cao nguyên hoa, thông và những thác nước.'),(27,3,'Đồng Nai','dong-nai',NULL,'Rừng, hồ và nhiều điểm dã ngoại gần đô thị.'),(28,3,'Tây Ninh','tay-ninh',NULL,'Núi Bà Đen và bản sắc văn hóa độc đáo.'),(29,3,'TP. Hồ Chí Minh','tp-ho-chi-minh','https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=900&q=80','Thành phố trẻ, sôi động và không ngủ.'),(30,3,'Đồng Tháp','dong-thap',NULL,'Đồng sen, vườn chim và miền quê hiền hòa.'),(31,3,'Vĩnh Long','vinh-long',NULL,'Miệt vườn trù phú giữa chín nhánh phù sa.'),(32,3,'An Giang','an-giang','https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80','Núi non miền biên viễn và đảo ngọc phương Nam.'),(33,3,'Cần Thơ','can-tho','https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=80','Tây Đô với chợ nổi và vườn cây trái.'),(34,3,'Cà Mau','ca-mau','https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=80','Điểm cuối trời Nam và rừng ngập mặn bao la.');
+/*!40000 ALTER TABLE `provinces` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ratings`
+--
+
+DROP TABLE IF EXISTS `ratings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ratings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `article_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `score` tinyint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_rating` (`article_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_rating_score` CHECK ((`score` between 1 and 5))
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ratings`
+--
+
+LOCK TABLES `ratings` WRITE;
+/*!40000 ALTER TABLE `ratings` DISABLE KEYS */;
+INSERT INTO `ratings` VALUES (1,1,2,5,'2026-08-11 04:31:02','2026-08-11 04:44:57'),(2,2,2,5,'2026-08-11 04:31:02','2026-08-11 04:31:02'),(3,4,2,4,'2026-08-11 04:31:02','2026-08-11 04:31:02'),(4,8,2,5,'2026-08-11 04:31:02','2026-08-11 04:31:02');
+/*!40000 ALTER TABLE `ratings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `regions`
+--
+
+DROP TABLE IF EXISTS `regions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `regions` (
+  `id` tinyint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `regions`
+--
+
+LOCK TABLES `regions` WRITE;
+/*!40000 ALTER TABLE `regions` DISABLE KEYS */;
+INSERT INTO `regions` VALUES (1,'Miền Bắc','mien-bac','Núi non hùng vĩ, di sản lâu đời và những mùa hoa rực rỡ.'),(2,'Miền Trung','mien-trung','Cung đường di sản, biển xanh và nét văn hóa miền duyên hải.'),(3,'Miền Nam','mien-nam','Miệt vườn sông nước, đảo ngọc và đô thị sôi động.');
+/*!40000 ALTER TABLE `regions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `avatar` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('customer','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'customer',
+  `status` enum('active','blocked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Quản trị viên','admin@vivuviet.vn','$2y$12$mh/cLwgcNAWP.W6l8kLM..SCOZVtkaCCVt8s2f3nP.c/2S3q/3vWC',NULL,'admin','active','2026-08-11 04:31:02','2026-08-11 04:31:02'),(2,'Nguyễn Minh Anh','user@vivuviet.vn','$2y$12$T1aXgvzpccQplHoyvNWl1.kW8sqPPwe7T51z9nW1syvoD40.8ZABG',NULL,'customer','active','2026-08-11 04:31:02','2026-08-11 07:07:52');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-08-11 14:22:45

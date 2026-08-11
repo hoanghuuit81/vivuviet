@@ -1,0 +1,15 @@
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+.env
+*.log
+
+uploads/avatars/*
+uploads/places/*
+!uploads/avatars/.gitkeep
+!uploads/places/.gitkeep
+
+node_modules/
+vendor/
