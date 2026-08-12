@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    // Keep the administration and client authentication contexts isolated.
+    // Both areas share this application path, so a single PHP session cookie
+    // would otherwise expose the admin's user_id on the public site.
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $basePath = rtrim((string) (require dirname(__DIR__) . '/config/app.php')['base_url'], '/');
+    $isAdminRequest = $basePath !== '' && ($requestPath === $basePath . '/admin' || str_starts_with($requestPath, $basePath . '/admin/'));
+    session_name($isAdminRequest ? 'VIVUVIET_ADMIN_SESSION' : 'VIVUVIET_CLIENT_SESSION');
     session_set_cookie_params([
         'httponly' => true,
         'samesite' => 'Lax',

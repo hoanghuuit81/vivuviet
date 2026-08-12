@@ -7,11 +7,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 verify_csrf();
-$action = (string) ($_POST['action'] ?? '');
+$action = (string) ($_POST['action'] ?? $_GET['action'] ?? '');
 $returnTo = safe_return_url($_POST['return_to'] ?? null, url());
 
 try {
     switch ($action) {
+        case 'upload_editor_image':
+            require_login();
+            $imageUrl = upload_place_image($_FILES['upload'] ?? []);
+            if (!$imageUrl) {
+                throw new RuntimeException('Không nhận được tệp ảnh để tải lên.');
+            }
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['url' => $imageUrl], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+
         case 'login':
             $email = mb_strtolower(trim((string) ($_POST['email'] ?? '')));
             $password = (string) ($_POST['password'] ?? '');
@@ -194,7 +204,7 @@ try {
             $short = trim((string) ($_POST['short_description'] ?? ''));
             $description = sanitize_rich_html((string) ($_POST['description'] ?? ''));
             $imageUrl = trim((string) ($_POST['image_url'] ?? ''));
-            if (mb_strlen($name) < 3 || !$provinceId || mb_strlen($address) < 5 || mb_strlen($short) < 20 || mb_strlen($description) < 80) {
+            if (mb_strlen($name) < 3 || !$provinceId || !$categoryId || mb_strlen($address) < 5 || mb_strlen($short) < 20 || mb_strlen($description) < 80) {
                 throw new RuntimeException('Vui lòng điền đầy đủ thông tin; bài giới thiệu cần ít nhất 80 ký tự.');
             }
             if ($imageUrl && !filter_var($imageUrl, FILTER_VALIDATE_URL)) {
@@ -327,6 +337,12 @@ try {
 } catch (RuntimeException $exception) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
+    }
+    if ($action === 'upload_editor_image') {
+        http_response_code(422);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => ['message' => $exception->getMessage()]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
     }
     flash('error', $exception->getMessage());
     redirect($returnTo);

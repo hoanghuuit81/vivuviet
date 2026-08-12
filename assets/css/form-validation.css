@@ -1,0 +1,15 @@
+.field-error {
+    color: var(--danger);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.form-grid [aria-invalid="true"] {
+    border-color: var(--danger);
+}
+
+.ck-editor__editable.has-field-error {
+    border: 1px solid var(--danger) !important;
+    border-radius: 7px;
+}

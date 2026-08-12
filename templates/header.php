@@ -16,10 +16,11 @@
         <link rel="stylesheet" href="<?= asset('css/admin-gate.css') ?>?v=1">
     <?php endif; ?>
     <?php if (in_array($page, ['submit-place', 'admin-place-create'], true)): ?>
+        <link rel="stylesheet" href="<?= asset('css/form-validation.css') ?>?v=1">
         <link rel="stylesheet" href="<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5.css') ?>">
         <link rel="stylesheet" href="<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5-content.css') ?>">
         <script type="importmap">{"imports":{"ckeditor5":"<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5.js') ?>","ckeditor5/":"<?= asset('ckeditor5-48.4.0/ckeditor5/') ?>"}}</script>
-        <script type="module" src="<?= asset('js/ckeditor-init.js') ?>"></script>
+        <script type="module" src="<?= asset('js/ckeditor-init.js') ?>?v=2"></script>
     <?php endif; ?>
 </head>
 <body class="page-<?= e($page) ?>">

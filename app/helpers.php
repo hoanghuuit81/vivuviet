@@ -60,7 +60,8 @@ function csrf_field(): string
 
 function verify_csrf(): void
 {
-    if (!hash_equals($_SESSION['csrf'] ?? '', (string) ($_POST['csrf'] ?? ''))) {
+    $token = (string) ($_POST['csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+    if (!hash_equals($_SESSION['csrf'] ?? '', $token)) {
         http_response_code(403);
         exit('Phiên làm việc đã hết hạn. Vui lòng tải lại trang.');
     }
@@ -197,13 +198,27 @@ function avatar_markup(?array $user, string $class = 'avatar'): string
 
 function sanitize_rich_html(string $html): string
 {
-    $allowed = '<p><br><strong><b><em><i><u><ul><ol><li><h2><h3><blockquote><a>';
+    $allowed = '<p><br><strong><b><em><i><u><ul><ol><li><h2><h3><blockquote><a><figure><img>';
     $html = trim(strip_tags($html, $allowed));
-    return preg_replace_callback('/<\s*(\/?)\s*(p|br|strong|b|em|i|u|ul|ol|li|h2|h3|blockquote|a)\b([^>]*)>/i', static function (array $match): string {
+    return preg_replace_callback('/<\s*(\/?)\s*(p|br|strong|b|em|i|u|ul|ol|li|h2|h3|blockquote|a|figure|img)\b([^>]*)>/i', static function (array $match): string {
         $closing = $match[1] === '/';
         $tag = strtolower($match[2]);
         if ($closing) {
             return '</' . $tag . '>';
+        }
+        if ($tag === 'img') {
+            $src = '';
+            $alt = '';
+            if (preg_match('/\bsrc\s*=\s*(["\'])(.*?)\1/i', $match[3], $srcMatch)) {
+                $src = trim($srcMatch[2]);
+            }
+            if (!preg_match('#^https?://#i', $src) && !str_starts_with($src, '/')) {
+                return '';
+            }
+            if (preg_match('/\balt\s*=\s*(["\'])(.*?)\1/i', $match[3], $altMatch)) {
+                $alt = trim($altMatch[2]);
+            }
+            return '<img src="' . e($src) . '" alt="' . e($alt) . '">';
         }
         if ($tag !== 'a') {
             return '<' . $tag . '>';
