@@ -1,11 +1,69 @@
 <?php
-$slug=(string)($_GET['slug']??''); $stmt=$pdo->prepare('SELECT pr.*,r.name region_name,r.slug region_slug FROM provinces pr JOIN regions r ON r.id=pr.region_id WHERE pr.slug=?'); $stmt->execute([$slug]); $province=$stmt->fetch();
-if(!$province){http_response_code(404);require __DIR__.'/404.php';return;}
-$pageTitle='Du lịch '.$province['name'].' — Vi Vu Việt';
-$category=filter_input(INPUT_GET,'category',FILTER_VALIDATE_INT); $sql="SELECT p.*,c.name category_name, COALESCE((SELECT ROUND(AVG(rt.score),1) FROM ratings rt JOIN articles ar ON ar.id=rt.article_id WHERE ar.place_id=p.id),0) rating_avg FROM places p LEFT JOIN categories c ON c.id=p.category_id WHERE p.province_id=? AND p.status='approved'"; $params=[$province['id']]; if($category){$sql.=' AND p.category_id=?';$params[]=$category;} $sql.=' ORDER BY p.is_featured DESC,p.created_at DESC'; $stmt=$pdo->prepare($sql);$stmt->execute($params);$places=$stmt->fetchAll(); $categories=$pdo->query('SELECT * FROM categories ORDER BY name')->fetchAll();
+$slug = (string) ($_GET['slug'] ?? '');
+$stmt = $pdo->prepare('SELECT pr.*,r.name region_name,r.slug region_slug FROM provinces pr JOIN regions r ON r.id=pr.region_id WHERE pr.slug=?');
+$stmt->execute([$slug]);
+$province = $stmt->fetch();
+if (!$province) {
+    http_response_code(404);
+    require __DIR__ . '/404.php';
+
+    return;
+}
+$pageTitle = 'Du lịch ' . $province['name'] . ' — Vi Vu Việt';
+$category  = filter_input(INPUT_GET, 'category', FILTER_VALIDATE_INT);
+$sql       = "SELECT p.*,c.name category_name, COALESCE((SELECT ROUND(AVG(rt.score),1) FROM ratings rt JOIN articles ar ON ar.id=rt.article_id WHERE ar.place_id=p.id),0) rating_avg FROM places p LEFT JOIN categories c ON c.id=p.category_id WHERE p.province_id=? AND p.status='approved'";
+$params    = [$province['id']];
+if ($category) {
+    $sql      .= ' AND p.category_id=?';
+    $params[] = $category;
+}
+$sql  .= ' ORDER BY p.is_featured DESC,p.created_at DESC';
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$places     = $stmt->fetchAll();
+$categories = $pdo->query('SELECT * FROM categories ORDER BY name')->fetchAll();
 ?>
-<section class="province-hero" style="--province-bg:url('<?= e(place_image($province['image'])) ?>')"><div class="province-overlay"></div><div class="container"><div class="breadcrumbs"><a href="<?= url() ?>">Trang chủ</a><span>/</span><a href="<?= url('region',['slug'=>$province['region_slug']]) ?>"><?= e($province['region_name']) ?></a><span>/</span><b><?= e($province['name']) ?></b></div><span class="location-label">⌖ <?= e($province['region_name']) ?></span><h1><?= e($province['name']) ?></h1><p><?= e($province['description']) ?></p></div></section>
-<section class="section"><div class="container"><div class="section-heading split"><div><div class="eyebrow"><span></span> Đi và cảm nhận</div><h2>Địa điểm tại <?= e($province['name']) ?></h2><p><?= count($places) ?> địa điểm đang chờ bạn khám phá.</p></div></div>
-<div class="filter-chips"><a class="<?= !$category?'active':'' ?>" href="<?= url('province',['slug'=>$slug]) ?>">Tất cả</a><?php foreach($categories as $cat):?><a class="<?= $category==(int)$cat['id']?'active':'' ?>" href="<?= url('province',['slug'=>$slug,'category'=>$cat['id']]) ?>"><?= e($cat['name']) ?></a><?php endforeach;?></div>
-<?php if($places):?><div class="place-grid"><?php foreach($places as $place):?><article class="place-card"><a class="place-image" href="<?= url('place',['slug'=>$place['slug']]) ?>"><img src="<?= e(place_image($place['cover_image'])) ?>" alt="<?= e($place['name']) ?>"><span><?= e($place['category_name']??'Khám phá') ?></span></a><div class="place-body"><div class="place-meta"><span>⌖ <?= e($province['name']) ?></span><span class="rating">★ <?= $place['rating_avg']?:'Mới' ?></span></div><h3><a href="<?= url('place',['slug'=>$place['slug']]) ?>"><?= e($place['name']) ?></a></h3><p><?= e($place['short_description']) ?></p><a class="card-link" href="<?= url('place',['slug'=>$place['slug']]) ?>">Xem bài viết <span>→</span></a></div></article><?php endforeach;?></div><?php else:?><div class="empty-state"><span>⌖</span><h3>Chưa có địa điểm phù hợp</h3><p>Hãy là người đầu tiên chia sẻ một góc đẹp ở <?= e($province['name']) ?>.</p><a class="button" href="<?= url('submit-place') ?>">Thêm địa danh</a></div><?php endif;?>
-</div></section>
+<section class="province-hero" style="--province-bg:url('<?= e(place_image($province['image'])) ?>')">
+    <div class="province-overlay"></div>
+    <div class="container">
+        <div class="breadcrumbs"><a href="<?= url() ?>">Trang chủ</a><span>/</span><a href="<?= url('region',
+                    ['slug' => $province['region_slug']]) ?>"><?= e($province['region_name']) ?></a><span>/</span><b><?= e($province['name']) ?></b>
+        </div>
+        <span class="location-label">⌖ <?= e($province['region_name']) ?></span>
+        <h1><?= e($province['name']) ?></h1>
+        <p><?= e($province['description']) ?></p></div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="section-heading split">
+            <div>
+                <div class="eyebrow"><span></span> Đi và cảm nhận</div>
+                <h2>Địa điểm tại <?= e($province['name']) ?></h2>
+                <p><?= count($places) ?> địa điểm đang chờ bạn khám phá.</p></div>
+        </div>
+        <div class="filter-chips"><a class="<?= !$category ? 'active' : '' ?>"
+                                     href="<?= url('province', ['slug' => $slug]) ?>">Tất
+                cả</a><?php foreach ($categories as $cat): ?><a
+                class="<?= $category == (int) $cat['id'] ? 'active' : '' ?>"href="<?= url('province',
+                        ['slug' => $slug, 'category' => $cat['id']]) ?>"><?= e($cat['name']) ?></a><?php endforeach; ?>
+        </div>
+        <?php if ($places): ?>
+            <div class="place-grid"><?php foreach ($places as $place): ?>
+                <article class="place-card"><a class="place-image"
+                                               href="<?= url('place', ['slug' => $place['slug']]) ?>"><img
+                            src="<?= e(place_image($place['cover_image'])) ?>"
+                            alt="<?= e($place['name']) ?>"><span><?= e($place['category_name'] ?? 'Khám phá') ?></span></a>
+                <div class="place-body">
+                    <div class="place-meta"><span>⌖ <?= e($province['name']) ?></span><span
+                                class="rating">★ <?= $place['rating_avg'] ?: 'Mới' ?></span></div>
+                    <h3><a href="<?= url('place', ['slug' => $place['slug']]) ?>"><?= e($place['name']) ?></a></h3>
+                    <p><?= e($place['short_description']) ?></p><a class="card-link" href="<?= url('place',
+                            ['slug' => $place['slug']]) ?>">Xem bài viết <span>→</span></a></div>
+                </article><?php endforeach; ?></div><?php else: ?>
+            <div class="empty-state"><span>⌖</span>
+            <h3>Chưa có địa điểm phù hợp</h3>
+            <p>Hãy là người đầu tiên chia sẻ một góc đẹp ở <?= e($province['name']) ?>.</p><a class="button"
+                                                                                              href="<?= url('submit-place') ?>">Thêm
+                địa danh</a></div><?php endif; ?>
+    </div>
+</section>

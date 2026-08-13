@@ -21,6 +21,7 @@ function article_metrics_sql(): string
 function featured_places(PDO $pdo, int $limit = 6): array
 {
     $limit = max(1, min(12, $limit));
+
     return $pdo->query("SELECT p.*, pr.name AS province_name, pr.slug AS province_slug,
         r.name AS region_name, c.name AS category_name,
         COALESCE((SELECT ROUND(AVG(rt.score),1) FROM ratings rt JOIN articles ar ON ar.id=rt.article_id WHERE ar.place_id=p.id),0) AS rating_avg
@@ -32,6 +33,7 @@ function featured_places(PDO $pdo, int $limit = 6): array
 function latest_articles(PDO $pdo, int $limit = 6): array
 {
     $limit = max(1, min(12, $limit));
+
     return $pdo->query(article_metrics_sql() . " WHERE a.status='published' AND p.status='approved'
         ORDER BY a.is_featured DESC, a.published_at DESC LIMIT {$limit}")->fetchAll();
 }

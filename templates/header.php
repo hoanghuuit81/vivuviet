@@ -19,7 +19,9 @@
         <link rel="stylesheet" href="<?= asset('css/form-validation.css') ?>?v=1">
         <link rel="stylesheet" href="<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5.css') ?>">
         <link rel="stylesheet" href="<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5-content.css') ?>">
-        <script type="importmap">{"imports":{"ckeditor5":"<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5.js') ?>","ckeditor5/":"<?= asset('ckeditor5-48.4.0/ckeditor5/') ?>"}}</script>
+        <script type="importmap">{"imports":{"ckeditor5":"<?= asset('ckeditor5-48.4.0/ckeditor5/ckeditor5.js') ?>
+            ","ckeditor5/":"<?= asset('ckeditor5-48.4.0/ckeditor5/') ?>"}}
+        </script>
         <script type="module" src="<?= asset('js/ckeditor-init.js') ?>?v=2"></script>
     <?php endif; ?>
 </head>
@@ -29,7 +31,8 @@
     <div class="container nav-wrap">
         <a class="brand" href="<?= url() ?>" aria-label="Vi Vu Việt - Trang chủ">
             <span class="brand-mark" aria-hidden="true">
-                <svg viewBox="0 0 48 48"><path d="M8 33c8-1 10-16 19-16 6 0 7 8 13 9-4 1-7 3-10 7H8Z"/><path d="M13 18c4-8 11-11 19-8-8 2-12 7-14 13"/></svg>
+                <svg viewBox="0 0 48 48"><path d="M8 33c8-1 10-16 19-16 6 0 7 8 13 9-4 1-7 3-10 7H8Z"/><path
+                            d="M13 18c4-8 11-11 19-8-8 2-12 7-14 13"/></svg>
             </span>
             <span><strong>Vi Vu</strong><small>VIỆT</small></span>
         </a>
@@ -41,7 +44,8 @@
         <nav class="main-nav" id="main-nav" aria-label="Điều hướng chính">
             <a class="<?= $page === 'home' ? 'active' : '' ?>" href="<?= url() ?>">Trang chủ</a>
             <div class="nav-dropdown">
-                <button class="dropdown-trigger <?= in_array($page, ['region','province','place'], true) ? 'active' : '' ?>" type="button" aria-expanded="false">
+                <button class="dropdown-trigger <?= in_array($page, ['region', 'province', 'place'],
+                        true) ? 'active' : '' ?>" type="button" aria-expanded="false">
                     Địa danh <span aria-hidden="true">⌄</span>
                 </button>
                 <div class="dropdown-menu">
@@ -50,7 +54,7 @@
                         <strong>Chọn miền bạn muốn đi</strong>
                     </div>
                     <?php foreach ($regionsForMenu as $menuRegion): ?>
-                        <a href="<?= url('region', ['slug'=>$menuRegion['slug']]) ?>">
+                        <a href="<?= url('region', ['slug' => $menuRegion['slug']]) ?>">
                             <span class="region-dot dot-<?= e($menuRegion['slug']) ?>"></span>
                             <span><strong><?= e($menuRegion['name']) ?></strong><small><?= e($menuRegion['description']) ?></small></span>
                             <b aria-hidden="true">→</b>
@@ -58,20 +62,24 @@
                     <?php endforeach; ?>
                 </div>
             </div>
-            <a class="<?= $page === 'articles' || $page === 'article' ? 'active' : '' ?>" href="<?= url('articles') ?>">Bài viết</a>
+            <a class="<?= $page === 'articles' || $page === 'article' ? 'active' : '' ?>" href="<?= url('articles') ?>">Bài
+                viết</a>
             <a class="<?= $page === 'contact' ? 'active' : '' ?>" href="<?= url('contact') ?>">Liên hệ</a>
             <a class="<?= $page === 'about' ? 'active' : '' ?>" href="<?= url('about') ?>">Về chúng tôi</a>
         </nav>
 
         <div class="nav-actions">
             <button class="icon-button search-open" type="button" aria-label="Tìm kiếm">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="m20 20-4-4"/>
+                </svg>
             </button>
             <?php if ($currentUser): ?>
                 <?php
                 $notificationStmt = $pdo->prepare('SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=0');
                 $notificationStmt->execute([$currentUser['id']]);
-                $notificationCount = (int)$notificationStmt->fetchColumn();
+                $notificationCount = (int) $notificationStmt->fetchColumn();
                 ?>
                 <div class="user-menu nav-dropdown">
                     <button class="user-trigger dropdown-trigger" type="button" aria-expanded="false">
@@ -80,11 +88,13 @@
                         <?php if ($notificationCount): ?><i><?= $notificationCount ?></i><?php endif; ?>
                     </button>
                     <div class="dropdown-menu user-dropdown">
-                        <div class="user-summary"><strong><?= e($currentUser['name']) ?></strong><small><?= e($currentUser['email']) ?></small></div>
+                        <div class="user-summary">
+                            <strong><?= e($currentUser['name']) ?></strong><small><?= e($currentUser['email']) ?></small>
+                        </div>
                         <a href="<?= url('profile') ?>">Hồ sơ của tôi</a>
-                        <a href="<?= url('profile',['tab'=>'favorites']) ?>">Bài viết đã thích</a>
-                        <a href="<?= url('profile',['tab'=>'submissions']) ?>">Địa danh đã thêm</a>
-                        <a href="<?= url('profile',['tab'=>'interactions']) ?>">Bình luận & đánh giá</a>
+                        <a href="<?= url('profile', ['tab' => 'favorites']) ?>">Bài viết đã thích</a>
+                        <a href="<?= url('profile', ['tab' => 'submissions']) ?>">Địa danh đã thêm</a>
+                        <a href="<?= url('profile', ['tab' => 'interactions']) ?>">Bình luận & đánh giá</a>
                         <a href="<?= url('submit-place') ?>">Thêm địa danh mới</a>
                         <form method="post" action="<?= url() ?>">
                             <?= csrf_field() ?><input type="hidden" name="action" value="logout">
@@ -105,13 +115,17 @@
     <form action="<?= url('search') ?>" method="get" class="search-overlay-form">
         <input type="hidden" name="page" value="search">
         <label for="global-search">Bạn muốn đi đâu?</label>
-        <div><input id="global-search" name="q" type="search" placeholder="Thử “Hội An”, “biển”, “Tây Bắc”…" required><button type="submit">Tìm kiếm</button></div>
+        <div><input id="global-search" name="q" type="search" placeholder="Thử “Hội An”, “biển”, “Tây Bắc”…" required>
+            <button type="submit">Tìm kiếm</button>
+        </div>
         <p>Gợi ý: Hạ Long · Hội An · Phú Quốc · Huế</p>
     </form>
 </div>
 
 <?php foreach (consume_flashes() as $flash): ?>
-    <div class="toast toast-<?= e($flash['type']) ?>" role="status"><span><?= e($flash['message']) ?></span><button type="button" aria-label="Đóng">×</button></div>
+    <div class="toast toast-<?= e($flash['type']) ?>" role="status"><span><?= e($flash['message']) ?></span>
+        <button type="button" aria-label="Đóng">×</button>
+    </div>
 <?php endforeach; ?>
 
 <main id="main-content">

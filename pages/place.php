@@ -1,10 +1,76 @@
 <?php
 $slug = (string) ($_GET['slug'] ?? '');
 $stmt = $pdo->prepare("SELECT p.*,pr.name province_name,pr.slug province_slug,r.name region_name,r.slug region_slug,c.name category_name FROM places p JOIN provinces pr ON pr.id=p.province_id JOIN regions r ON r.id=pr.region_id LEFT JOIN categories c ON c.id=p.category_id WHERE p.slug=? AND p.status='approved'");
-$stmt->execute([$slug]); $place = $stmt->fetch();
-if (!$place) { http_response_code(404); require __DIR__ . '/404.php'; return; }
-$pageTitle = $place['name'] . ' — Vi Vu Việt'; $metaDescription = $place['short_description'];
-$stmt = $pdo->prepare(article_metrics_sql() . " WHERE a.place_id=? AND a.status='published' ORDER BY a.is_featured DESC,a.published_at DESC"); $stmt->execute([$place['id']]); $articles = $stmt->fetchAll();
+$stmt->execute([$slug]);
+$place = $stmt->fetch();
+if (!$place) {
+    http_response_code(404);
+    require __DIR__ . '/404.php';
+
+    return;
+}
+$pageTitle       = $place['name'] . ' — Vi Vu Việt';
+$metaDescription = $place['short_description'];
+$stmt            = $pdo->prepare(article_metrics_sql() . " WHERE a.place_id=? AND a.status='published' ORDER BY a.is_featured DESC,a.published_at DESC");
+$stmt->execute([$place['id']]);
+$articles = $stmt->fetchAll();
 ?>
-<section class="detail-hero"><img src="<?= e(place_image($place['cover_image'])) ?>" alt="<?= e($place['name']) ?>"><div class="detail-shade"></div><div class="container"><div class="breadcrumbs"><a href="<?= url() ?>">Trang chủ</a><span>/</span><a href="<?= url('region',['slug'=>$place['region_slug']]) ?>"><?= e($place['region_name']) ?></a><span>/</span><a href="<?= url('province',['slug'=>$place['province_slug']]) ?>"><?= e($place['province_name']) ?></a></div><span class="detail-tag"><?= e($place['category_name'] ?? 'Khám phá') ?></span><h1><?= e($place['name']) ?></h1><p>⌖ <?= e($place['address']) ?></p></div></section>
-<section class="section place-detail"><div class="container detail-layout"><div class="detail-main"><div class="eyebrow"><span></span> Câu chuyện điểm đến</div><h2>Vì sao bạn nên ghé nơi đây?</h2><div class="rich-text rich-editor-content"><?= rich_content($place['description']) ?></div><h2 class="related-heading">Bài viết về <?= e($place['name']) ?></h2><?php if ($articles): ?><div class="article-list"><?php foreach ($articles as $article): ?><article><a class="list-image" href="<?= url('article',['slug'=>$article['slug']]) ?>"><img src="<?= e(place_image($article['cover_image'])) ?>" alt="<?= e($article['title']) ?>"></a><div><div class="article-kicker"><?= format_date($article['published_at']) ?> · ★ <?= $article['rating_avg'] ?: 'Mới' ?></div><h3><a href="<?= url('article',['slug'=>$article['slug']]) ?>"><?= e($article['title']) ?></a></h3><p><?= e($article['excerpt']) ?></p><a class="card-link" href="<?= url('article',['slug'=>$article['slug']]) ?>">Đọc bài viết <span>→</span></a></div></article><?php endforeach; ?></div><?php else: ?><div class="empty-state compact"><p>Chưa có bài viết cho địa điểm này.</p></div><?php endif; ?></div><aside class="detail-sidebar"><div class="info-card"><h3>Thông tin hữu ích</h3><dl><div><dt>Địa chỉ</dt><dd><?= e($place['address']) ?></dd></div><div><dt>Giờ hoạt động</dt><dd><?= e($place['opening_hours'] ?: 'Đang cập nhật') ?></dd></div><div><dt>Chi phí tham khảo</dt><dd><?= e($place['price_info'] ?: 'Đang cập nhật') ?></dd></div><div><dt>Loại hình</dt><dd><?= e($place['category_name'] ?: 'Khám phá') ?></dd></div></dl></div><div class="contribute-card"><span>✦</span><h3>Bạn từng đến đây?</h3><p>Chia sẻ cảm nhận trong bài viết để giúp cộng đồng có thêm góc nhìn.</p><?php if ($articles): ?><a class="button button-block" href="<?= url('article',['slug'=>$articles[0]['slug']]) ?>#comments">Viết bình luận</a><?php endif; ?></div></aside></div></section>
+<section class="detail-hero"><img src="<?= e(place_image($place['cover_image'])) ?>" alt="<?= e($place['name']) ?>">
+    <div class="detail-shade"></div>
+    <div class="container">
+        <div class="breadcrumbs"><a href="<?= url() ?>">Trang chủ</a><span>/</span><a href="<?= url('region',
+                    ['slug' => $place['region_slug']]) ?>"><?= e($place['region_name']) ?></a><span>/</span><a
+                    href="<?= url('province',
+                            ['slug' => $place['province_slug']]) ?>"><?= e($place['province_name']) ?></a></div>
+        <span class="detail-tag"><?= e($place['category_name'] ?? 'Khám phá') ?></span>
+        <h1><?= e($place['name']) ?></h1>
+        <p>⌖ <?= e($place['address']) ?></p></div>
+</section>
+<section class="section place-detail">
+    <div class="container detail-layout">
+        <div class="detail-main">
+            <div class="eyebrow"><span></span> Câu chuyện điểm đến</div>
+            <h2>Vì sao bạn nên ghé nơi đây?</h2>
+            <div class="rich-text rich-editor-content"><?= rich_content($place['description']) ?></div>
+            <h2 class="related-heading">Bài viết về <?= e($place['name']) ?></h2><?php if ($articles): ?>
+                <div class="article-list"><?php foreach ($articles as $article): ?>
+                    <article><a class="list-image" href="<?= url('article', ['slug' => $article['slug']]) ?>"><img
+                                src="<?= e(place_image($article['cover_image'])) ?>" alt="<?= e($article['title']) ?>"></a>
+                    <div>
+                        <div class="article-kicker"><?= format_date($article['published_at']) ?> ·
+                            ★ <?= $article['rating_avg'] ?: 'Mới' ?></div>
+                        <h3><a href="<?= url('article',
+                                    ['slug' => $article['slug']]) ?>"><?= e($article['title']) ?></a></h3>
+                        <p><?= e($article['excerpt']) ?></p><a class="card-link" href="<?= url('article',
+                                ['slug' => $article['slug']]) ?>">Đọc bài viết <span>→</span></a></div>
+                    </article><?php endforeach; ?></div><?php else: ?>
+                <div class="empty-state compact"><p>Chưa có bài viết cho địa điểm này.</p></div><?php endif; ?></div>
+        <aside class="detail-sidebar">
+            <div class="info-card"><h3>Thông tin hữu ích</h3>
+                <dl>
+                    <div>
+                        <dt>Địa chỉ</dt>
+                        <dd><?= e($place['address']) ?></dd>
+                    </div>
+                    <div>
+                        <dt>Giờ hoạt động</dt>
+                        <dd><?= e($place['opening_hours'] ?: 'Đang cập nhật') ?></dd>
+                    </div>
+                    <div>
+                        <dt>Chi phí tham khảo</dt>
+                        <dd><?= e($place['price_info'] ?: 'Đang cập nhật') ?></dd>
+                    </div>
+                    <div>
+                        <dt>Loại hình</dt>
+                        <dd><?= e($place['category_name'] ?: 'Khám phá') ?></dd>
+                    </div>
+                </dl>
+            </div>
+            <div class="contribute-card"><span>✦</span>
+                <h3>Bạn từng đến đây?</h3>
+                <p>Chia sẻ cảm nhận trong bài viết để giúp cộng đồng có thêm góc nhìn.</p><?php if ($articles): ?><a
+                    class="button button-block" href="<?= url('article', ['slug' => $articles[0]['slug']]) ?>#comments">
+                        Viết bình luận</a><?php endif; ?></div>
+        </aside>
+    </div>
+</section>

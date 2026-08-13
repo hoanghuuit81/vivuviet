@@ -6,15 +6,16 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     // Keep the administration and client authentication contexts isolated.
     // Both areas share this application path, so a single PHP session cookie
     // would otherwise expose the admin's user_id on the public site.
-    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-    $basePath = rtrim((string) (require dirname(__DIR__) . '/config/app.php')['base_url'], '/');
-    $isAdminRequest = $basePath !== '' && ($requestPath === $basePath . '/admin' || str_starts_with($requestPath, $basePath . '/admin/'));
+    $requestPath    = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $basePath       = rtrim((string) (require dirname(__DIR__) . '/config/app.php')['base_url'], '/');
+    $isAdminRequest = $basePath !== '' && ($requestPath === $basePath . '/admin' || str_starts_with($requestPath,
+                $basePath . '/admin/'));
     session_name($isAdminRequest ? 'VIVUVIET_ADMIN_SESSION' : 'VIVUVIET_CLIENT_SESSION');
     session_set_cookie_params([
         'httponly' => true,
         'samesite' => 'Lax',
-        'secure' => isset($_SERVER['HTTPS']),
-        'path' => '/miniproject',
+        'secure'   => isset($_SERVER['HTTPS']),
+        'path'     => '/miniproject',
     ]);
     session_start();
 }
@@ -26,15 +27,15 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 $config = require dirname(__DIR__) . '/config/app.php';
 
 try {
-    $db = $config['database'];
+    $db  = $config['database'];
     $pdo = new PDO(
         "mysql:host={$db['host']};port={$db['port']};dbname={$db['name']};charset=utf8mb4",
         $db['user'],
         $db['pass'],
         [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_EMULATE_PREPARES   => false,
         ]
     );
 } catch (PDOException $exception) {

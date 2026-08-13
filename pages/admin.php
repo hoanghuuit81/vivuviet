@@ -78,10 +78,11 @@ if ($tab === 'contacts') {
         <div class="admin-main">
             <?php if ($tab === 'overview'): ?>
                 <div class="admin-welcome">
-                <div><p><?= date('d/m/Y') ?></p>
-                    <h2>Chào <?= e($admin['name']) ?>,</h2><span>Đây là những gì đang diễn ra trên Vi Vu Việt.</span>
-                </div>
-                <a class="button" href="<?= url('admin-place-create') ?>">+ Thêm địa danh</a></div>
+                    <div><p><?= date('d/m/Y') ?></p>
+                        <h2>Chào <?= e($admin['name']) ?>,</h2>
+                        <span>Đây là những gì đang diễn ra trên Vi Vu Việt.</span>
+                    </div>
+                    <a class="button" href="<?= url('admin-place-create') ?>">+ Thêm địa danh</a></div>
                 <div class="admin-stats">
                     <div><span class="admin-stat-icon green">⌖</span>
                         <p><small>Địa danh công khai</small><strong><?= (int) $stats['places'] ?></strong></p></div>
@@ -128,7 +129,7 @@ if ($tab === 'contacts') {
                 <span class="queue-count"><?= count($pendingPlaces) ?> mục chờ xử lý</span>
                 </div><?php if ($pendingPlaces): ?>
                     <div class="moderation-list"><?php foreach ($pendingPlaces as $item): ?>
-                        <article class="moderation-card" id="place-<?= $item['id'] ?>">
+                    <article class="moderation-card" id="place-<?= $item['id'] ?>">
                         <div class="moderation-image"><img src="<?= e(place_image($item['cover_image'])) ?>"
                                                            alt="<?= e($item['name']) ?>"><span><?= e($item['category_name'] ?: 'Chưa phân loại') ?></span>
                         </div>
@@ -179,9 +180,9 @@ if ($tab === 'contacts') {
                         <p>Tất cả địa danh đã được xử lý.</p></div><?php endif; ?>
             <?php elseif ($tab === 'places'): ?>
                 <div class="admin-page-intro">
-                <div><h2>Tất cả địa danh</h2>
-                    <p>Quản lý trạng thái và nội dung nổi bật.</p></div>
-                <a class="button" href="<?= url('admin-place-create') ?>">+ Thêm địa danh</a></div>
+                    <div><h2>Tất cả địa danh</h2>
+                        <p>Quản lý trạng thái và nội dung nổi bật.</p></div>
+                    <a class="button" href="<?= url('admin-place-create') ?>">+ Thêm địa danh</a></div>
                 <div class="admin-table-wrap">
                     <table class="admin-table">
                         <thead>
@@ -284,9 +285,9 @@ if ($tab === 'contacts') {
                 </div>
             <?php elseif ($tab === 'comments'): ?>
                 <div class="admin-page-intro">
-                <div><h2>Bình luận cộng đồng</h2>
-                    <p>Ẩn nội dung không phù hợp hoặc khôi phục khi cần.</p></div>
-                <span class="queue-count"><?= count($comments) ?> bình luận</span></div>
+                    <div><h2>Bình luận cộng đồng</h2>
+                        <p>Ẩn nội dung không phù hợp hoặc khôi phục khi cần.</p></div>
+                    <span class="queue-count"><?= count($comments) ?> bình luận</span></div>
                 <div class="admin-table-wrap">
                     <table class="admin-table">
                         <thead>
@@ -325,13 +326,63 @@ if ($tab === 'contacts') {
                     </table>
                 </div>
             <?php elseif ($tab === 'contacts'): ?>
-                <div class="admin-page-intro"><div><h2>Liên hệ từ website</h2><p>Theo dõi và xử lý các yêu cầu gửi từ khách truy cập và thành viên.</p></div><span class="queue-count"><?= count($contacts) ?> liên hệ</span></div>
-                <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Người gửi</th><th>Chủ đề & nội dung</th><th>Thông tin</th><th>Ngày gửi</th><th>Trạng thái</th><th></th></tr></thead><tbody><?php foreach ($contacts as $item): ?><tr><td><strong><?= e($item['name']) ?></strong><small class="table-sub"><?= e($item['account_name'] ?: 'Khách vãng lai') ?></small></td><td class="comment-cell"><strong><?= e($item['subject']) ?></strong><small class="table-sub"><?= e(excerpt($item['message'], 130)) ?></small></td><td><?= e($item['email']) ?><small class="table-sub"><?= e($item['phone'] ?: '—') ?></small></td><td><?= format_date($item['created_at']) ?></td><td><em class="status status-<?= e($item['status']) ?>"><?= e(status_label($item['status'])) ?></em></td><td><form method="post" action="<?= url('admin',['tab'=>'contacts']) ?>"><?= csrf_field() ?><input type="hidden" name="action" value="admin_contact_status"><input type="hidden" name="message_id" value="<?= $item['id'] ?>"><input type="hidden" name="return_to" value="<?= e(url('admin',['tab'=>'contacts'])) ?>"><select class="admin-status-select" name="status" onchange="this.form.submit()"><option value="new" <?= $item['status']==='new'?'selected':'' ?>>Mới</option><option value="read" <?= $item['status']==='read'?'selected':'' ?>>Đã đọc</option><option value="resolved" <?= $item['status']==='resolved'?'selected':'' ?>>Đã xử lý</option></select></form></td></tr><?php endforeach; ?><?php if (!$contacts): ?><tr><td colspan="6" class="table-empty">Chưa có liên hệ nào.</td></tr><?php endif; ?></tbody></table></div>
+                <div class="admin-page-intro">
+                    <div><h2>Liên hệ từ website</h2>
+                        <p>Theo dõi và xử lý các yêu cầu gửi từ khách truy cập và thành viên.</p></div>
+                    <span class="queue-count"><?= count($contacts) ?> liên hệ</span></div>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th>Người gửi</th>
+                            <th>Chủ đề & nội dung</th>
+                            <th>Thông tin</th>
+                            <th>Ngày gửi</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody><?php foreach ($contacts as $item): ?>
+                            <tr>
+                            <td><strong><?= e($item['name']) ?></strong><small
+                                        class="table-sub"><?= e($item['account_name'] ?: 'Khách vãng lai') ?></small>
+                            </td>
+                            <td class="comment-cell"><strong><?= e($item['subject']) ?></strong><small
+                                        class="table-sub"><?= e(excerpt($item['message'], 130)) ?></small></td>
+                            <td><?= e($item['email']) ?><small class="table-sub"><?= e($item['phone'] ?: '—') ?></small>
+                            </td>
+                            <td><?= format_date($item['created_at']) ?></td>
+                            <td>
+                                <em class="status status-<?= e($item['status']) ?>"><?= e(status_label($item['status'])) ?></em>
+                            </td>
+                            <td>
+                                <form method="post"
+                                      action="<?= url('admin', ['tab' => 'contacts']) ?>"><?= csrf_field() ?><input
+                                            type="hidden" name="action" value="admin_contact_status"><input
+                                            type="hidden" name="message_id" value="<?= $item['id'] ?>"><input
+                                            type="hidden" name="return_to"
+                                            value="<?= e(url('admin', ['tab' => 'contacts'])) ?>"><select
+                                            class="admin-status-select" name="status" onchange="this.form.submit()">
+                                        <option value="new" <?= $item['status'] === 'new' ? 'selected' : '' ?>>Mới
+                                        </option>
+                                        <option value="read" <?= $item['status'] === 'read' ? 'selected' : '' ?>>Đã
+                                            đọc
+                                        </option>
+                                        <option value="resolved" <?= $item['status'] === 'resolved' ? 'selected' : '' ?>>
+                                            Đã xử lý
+                                        </option>
+                                    </select></form>
+                            </td></tr><?php endforeach; ?><?php if (!$contacts): ?>
+                            <tr>
+                                <td colspan="6" class="table-empty">Chưa có liên hệ nào.</td>
+                            </tr><?php endif; ?></tbody>
+                    </table>
+                </div>
             <?php else: ?>
                 <div class="admin-page-intro">
-                <div><h2>Người dùng</h2>
-                    <p>Quản lý quyền truy cập của thành viên.</p></div>
-                <span class="queue-count"><?= count($users) ?> tài khoản</span></div>
+                    <div><h2>Người dùng</h2>
+                        <p>Quản lý quyền truy cập của thành viên.</p></div>
+                    <span class="queue-count"><?= count($users) ?> tài khoản</span></div>
                 <div class="admin-table-wrap">
                 <table class="admin-table">
                     <thead>
